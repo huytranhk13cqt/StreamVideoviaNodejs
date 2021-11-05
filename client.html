@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Server Streaming</title>
+	</head>
+	<body>
+		<img src="" alt="" />
+		<script>
+			// This server is only for the local server
+			// It's not good but i'll put my local IP address here
+			const img = document.querySelector('img');
+
+			// ipconfig trong CMD rồi chạy port của WebSocket là 8888
+			const WS_URL = 'ws:///192.168.1.217:8808';
+			const ws = new WebSocket(WS_URL);
+
+			// the purpose of this HTML document is to connect WebSocket
+			// through this and also showing a streaming image from WebSocket
+			let urlObject;
+			ws.onopen = () => {
+				console.log(`Connected to ${WS_URL}`);
+			};
+
+			// the message from other client is only (binary data)
+			// so it's necessary to convert (from binara to jpeg image)
+			ws.onmessage = (message) => {
+				const arrayBuffer = message.data;
+
+				if (urlObject) {
+					URL.revokeObjectURL(urlObject);
+				}
+
+				urlObject = URL.createObjectURL(new Blob([arrayBuffer]));
+
+				// finaly, we can put the Blob Object into image source
+				img.src = urlObject;
+			};
+		</script>
+	</body>
+</html>
